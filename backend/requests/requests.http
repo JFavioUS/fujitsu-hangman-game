@@ -1,0 +1,19 @@
+@hostname = http://localhost:3000
+@id = 109
+
+### GET "/"
+{{hostname}}
+
+### GET "/game/start-game"
+{{hostname}}/game/start-game
+
+### GET "/game/:id"
+{{hostname}}/game/{{id}}
+
+### POST "/game/:id"
+POST {{hostname}}/game/{{id}}
+Content-Type: application/json
+
+{
+  "letterGuessed": "w"
+}

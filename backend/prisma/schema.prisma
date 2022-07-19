@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  totalGuesses Int
+  tries Int @default(10)
+  word String
+  allLetters String @default("")
+  rightLetters String @default("")
+  wrongLetters String @default("")
+  status String
+  finished Boolean @default(false)
+}

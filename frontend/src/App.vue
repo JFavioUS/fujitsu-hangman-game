@@ -8,7 +8,11 @@
     </div>
     <div class="game-word">
       <div>
-        <AppWord :letters="letters" :correct-letters="correctLetters" />
+        <AppWord
+          :letters="expectedLetters"
+          :correct-letters="correctLetters"
+          :word-length="wordLength"
+        />
         <AppInputLetter
           @guess-letter="manualInput"
           @manual-change="manualInputChange"
@@ -44,11 +48,6 @@ import AppChooseGame from "./components/AppChooseGame";
 
 import onKeydown from "./assets/onKeydown.js";
 
-import dataJSON from "./assets/englishWords.json";
-
-const { words } = dataJSON;
-const randomWord = () => words[Math.floor(Math.random() * words.length)];
-
 export default {
   components: {
     AppHeader,
@@ -63,17 +62,22 @@ export default {
   },
 
   setup() {
-    const word = ref(randomWord());
+    const word = ref("");
+    const wordLength = ref(0);
     const guessedLetters = ref([]);
     const manualInputLetter = ref("");
     const manualGameType = ref(true);
     const NUMBER_GUESSES = 10;
-    const letters = computed(() => word.value.split(""));
+    const expectedLetters = computed(() => word.value.split(""));
     const wrongLetters = computed(() =>
-      guessedLetters.value.filter((letter) => !letters.value.includes(letter))
+      guessedLetters.value.filter(
+        (letter) => !expectedLetters.value.includes(letter)
+      )
     );
     const correctLetters = computed(() =>
-      guessedLetters.value.filter((letter) => letters.value.includes(letter))
+      guessedLetters.value.filter((letter) =>
+        expectedLetters.value.includes(letter)
+      )
     );
     const guessesLeft = computed(
       () => NUMBER_GUESSES - wrongLetters.value.length
@@ -82,7 +86,9 @@ export default {
     const status = computed(() => {
       if (wrongLetters.value.length === NUMBER_GUESSES) return "lose";
       if (
-        letters.value.every((letter) => correctLetters.value.includes(letter))
+        expectedLetters.value.every((letter) =>
+          correctLetters.value.includes(letter)
+        )
       )
         return "win";
 
@@ -91,7 +97,7 @@ export default {
 
     const reset = () => {
       guessedLetters.value = [];
-      word.value = randomWord();
+      startGame();
     };
 
     const notification = ref(false);
@@ -140,8 +146,19 @@ export default {
       }
     });
 
+    const startGame = () => {
+      fetch("http://localhost:3000/game/start-game")
+        .then((response) => response.json())
+        .then((data) => {
+          wordLength.value = data.randomWord;
+        })
+        .catch((error) => console.error(error));
+    };
+
+    startGame();
+
     return {
-      letters,
+      expectedLetters,
       word,
       wrongLetters,
       correctLetters,
@@ -155,6 +172,7 @@ export default {
       manualInputChange,
       changeGameMode,
       manualGameType,
+      wordLength,
     };
   },
 };
