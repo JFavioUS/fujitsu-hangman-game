@@ -1,5 +1,5 @@
 @hostname = http://localhost:3000
-@id = 109
+@id = 111
 
 ### GET "/"
 {{hostname}}
@@ -15,5 +15,5 @@ POST {{hostname}}/game/{{id}}
 Content-Type: application/json
 
 {
-  "letterGuessed": "w"
+  "letterGuessed": "t"
 }

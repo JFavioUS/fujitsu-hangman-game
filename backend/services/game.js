@@ -27,6 +27,24 @@ function validateInput(letterGuessed) {
 
   return true;
 }
+
+function getIndicesOf(searchString, string) {
+  const searchStringLength = searchString.length;
+  if (searchStringLength === 0) {
+    return [];
+  }
+
+  let startIndex = 0;
+  let index;
+  let indices = [];
+
+  while ((index = string.indexOf(searchString, startIndex)) > -1) {
+    indices.push(index);
+    startIndex = index + searchStringLength;
+  }
+
+  return indices;
+}
 // ------ END: This functions would go to a different utils file ------
 
 async function startGame() {
@@ -74,12 +92,26 @@ async function getGame(id) {
     },
   });
 
-  return game;
+  const rightLettersPositions = {};
+
+  for (letter of game.rightLetters) {
+    const indicesOf = getIndicesOf(letter, game.word);
+
+    rightLettersPositions[letter] = indicesOf;
+  }
+
+  const gameResponse = {
+    ...game,
+    rightLettersPositions: rightLettersPositions,
+  };
+
+  return gameResponse;
 }
 
 async function playGame(game, playInfo) {
   const fLetters = formatLetters(game);
-  const letterGuessed = playInfo.letterGuessed.toLowerCase();
+
+  const letterGuessed = playInfo?.letterGuessed?.toLowerCase();
 
   const status = gameStatus(game, fLetters);
 
@@ -124,6 +156,7 @@ async function playGame(game, playInfo) {
     .filter((letter) => !fLetters.expected.includes(letter))
     .join("");
   const tries = game.totalGuesses - wrongLetters.length;
+  const indicesOf = getIndicesOf(letterGuessed, game.word);
 
   const updatedGame = await prisma.game.update({
     where: { id: game.id },
@@ -140,6 +173,9 @@ async function playGame(game, playInfo) {
       finished: true,
     },
   });
+
+  updatedGame["positions"] = indicesOf;
+  updatedGame["letterGuessed"] = letterGuessed;
 
   return updatedGame;
 }

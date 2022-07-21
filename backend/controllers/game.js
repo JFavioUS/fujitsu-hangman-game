@@ -21,7 +21,7 @@ router.get("/:id", async function (req, res) {
 
   const responseObject = {
     ...game,
-    word: game.word.length,
+    word: game?.word?.length,
   };
 
   res.send(responseObject);
@@ -40,7 +40,7 @@ router.post("/:id", async function (req, res) {
       word: updatedGameResponse.word.length,
     };
 
-    res.send(responseObject);
+    return res.send(responseObject);
   }
 
   res.send(updatedGameResponse);
