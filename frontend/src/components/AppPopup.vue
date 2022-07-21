@@ -2,7 +2,7 @@
   <div v-if="finalMessage" class="popup-container" id="popup-container">
     <div class="popup">
       <h2>{{ finalMessage }}</h2>
-      <p>The word was: {{ word }}</p>
+      <p>The word was: {{ word.join("") }}</p>
       <button @click="reset">Play Again</button>
     </div>
   </div>
